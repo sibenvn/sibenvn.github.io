@@ -74,6 +74,11 @@ textarea::-webkit-input-placeholder
     color: #fff;
 }
 
+ins.adsbygoogle[data-ad-status=unfilled]
+{
+    display:none!important;
+}
+
 .container
 {
     margin: 0 auto;
