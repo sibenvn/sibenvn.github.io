@@ -162,7 +162,7 @@ $.pageNotFound = () => {
 $.meta = {
     title: 'Sĩ Ben',
     desc: 'Sĩ Ben là trang web Blog cá nhân chuyên chia sẻ miễn phí các kiến thức, thủ thuật, mẹo hay liên quan đến lập trình và phát triển phần mềm hàng đầu VN.',
-    image: 'https://sibenvn.github.io/assets/img/thumbnail.png'
+    image: 'https://sibenvn.github.io/assets/thumbnail.png'
 };
 $.labels = {
     'thu-thuat': 'Thủ Thuật',
