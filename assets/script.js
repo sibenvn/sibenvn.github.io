@@ -162,7 +162,7 @@ $.pageNotFound = () => {
 $.meta = {
     title: 'Sĩ Ben',
     desc: 'Sĩ Ben là trang web Blog cá nhân chuyên chia sẻ miễn phí các kiến thức, thủ thuật, mẹo hay liên quan đến lập trình và phát triển phần mềm hàng đầu VN.',
-    image: 'https://sibenvn.github.io/assets/thumbnail.png'
+    image: 'https://sibenvn.github.io/assets/img/thumbnail.png'
 };
 $.labels = {
     'thu-thuat': 'Thủ Thuật',
@@ -381,6 +381,7 @@ $.handler = async (path) => {
         let data = await $.fetchPosts(text);
         if (!('items' in data)) {
             $('#blog').html('<p style="text-align: center;color: #5c5757;padding: 38px 0px 24px 0px">Chưa có đăng bài nào cả.</p>');
+            $.ads();
             return;
         }
         data['items'].forEach((item) => {
