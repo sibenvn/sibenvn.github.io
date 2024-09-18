@@ -191,7 +191,7 @@ $.fetchPosts = async (label = '', token = '') =>
 {
     const params = {
         fields: 'items(url,title,labels,updated,published),nextPageToken',
-        maxResults: 2
+        maxResults: 10
     };
     if (label !== '') {
         Object.assign(params, {
