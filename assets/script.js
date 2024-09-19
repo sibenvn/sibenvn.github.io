@@ -274,7 +274,6 @@ $.layouts = () => {
         <link rel="preconnect dns-prefetch" href="//cse.google.com">
         <link rel="preconnect dns-prefetch" href="//fonts.gstatic.com">
         <link rel="preconnect dns-prefetch" href="//fonts.googleapis.com">
-        <link rel="preconnect dns-prefetch" href="//sibenvn.github.io">
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
         <link rel="canonical" href="${$.getURLCurrent()}">
     `);
@@ -389,17 +388,21 @@ $.loadEvent('scroll click', () => {
 $.handler = async (path) => {
     if (path == '/' || $.labels.hasOwnProperty(path.replace('/', ''))) {
         let text = path.replace('/', '');
+        let meta = {};
         if (path == '/') {
-            $.seo($.meta);
+            meta = $.meta;
         } else {
-            $.seo({
+            meta = {
                 title: $.labels[text],
                 desc: `Chuyên mục đăng tải các bài viết hay liên quan về ${$.labels[text]} trên Blog.`,
                 image: $.meta.image
-            });
+            };
         }
+        $.seo(meta);
         $('#blog').html(`
             <div class="blog">
+            <h1 class="hidden">${meta.title}</h1>
+            <p class="hidden">${meta.desc}</p>
             <div class="posts" id="posts"></div>
             <div id="loading" class="lds-ellipsis hidden"><div></div><div></div><div></div><div></div></div>
             <div class="pagination">
@@ -412,7 +415,8 @@ $.handler = async (path) => {
         $.hide(showmore);
         let data = await $.fetchPosts(text);
         if (!('items' in data)) {
-            $('#blog').html('<p style="text-align: center;color: #5c5757;padding: 38px 0px 24px 0px">Chưa có đăng bài nào cả.</p>');
+            $('#posts').html('<p style="text-align: center;color: #5c5757;padding: 28px 0px 19px 0px">Chưa có đăng bài nào cả.</p>');
+            $.hide(loading);
             return;
         }
         data['items'].forEach((item) => {
