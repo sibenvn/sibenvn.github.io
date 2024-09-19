@@ -6,10 +6,13 @@ js.prototype.getSelector = function (s, c) {
     if (s instanceof HTMLElement) {
         return [s];
     }
+    if (s instanceof Array) {
+        return [].slice.call(s);
+    }
+    if (s instanceof Object) {
+        return [s];
+    }
     if (s && typeof s !== 'string') {
-        if (s.length !== undefined) {
-            return s;
-        }
         return [s];
     }
     c = c || document;
@@ -159,6 +162,15 @@ $.getURLCurrent = () => {
 $.pageNotFound = () => {
     $('html').html(`<head><title>Not Found</title><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="robots" content="noindex"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico"><link rel="dns-prefetch" href="//fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin><link href="https://fonts.googleapis.com/css?family=Roboto:400" rel="stylesheet"><style>*{-webkit-tap-highlight-color:transparent;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none;outline:none}body{font-family:"Roboto",system-ui,Helvetica,Arial,sans-serif;color:#a0aec0;background-color:#1a202c;font-size:20px;padding:0;margin:0}.container{display:block}.error{margin:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:1rem;min-height:100vh}.error>.error-body{display:block}.error>.error-body>.error-status-code{display:inline-block}.error>.error-body>.error-text{display:inline-block;text-transform:uppercase;border-left:1px solid #e2e8f0;padding-left:15px;padding-bottom:3px;margin-left:15px}</style></head><body><div class="container"><div class="error"><div class="error-body"><div class="error-status-code">404</div><div class="error-text">Not Found</div></div></div></div></body>`);
 };
+$.loadEvent = (events, callback) => {
+    let isLoaded = false;
+    $(window).addEvent(events, () => {
+        if (isLoaded === false) {
+            callback();
+            isLoaded = true
+        }
+    });
+};
 $.meta = {
     title: 'Sĩ Ben',
     desc: 'Sĩ Ben là trang web Blog cá nhân chuyên chia sẻ miễn phí các kiến thức, thủ thuật, mẹo hay liên quan đến lập trình và phát triển phần mềm hàng đầu VN.',
@@ -262,6 +274,7 @@ $.layouts = () => {
         <link rel="preconnect dns-prefetch" href="//cse.google.com">
         <link rel="preconnect dns-prefetch" href="//fonts.gstatic.com">
         <link rel="preconnect dns-prefetch" href="//fonts.googleapis.com">
+        <link rel="preconnect dns-prefetch" href="//sibenvn.github.io">
         <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
         <link rel="canonical" href="${$.getURLCurrent()}">
     `);
@@ -347,13 +360,32 @@ $.getImage = (str) => {
     let match = str.match(/src="(.+?)"/);
     return match ? match[1] : $.meta.image;
 };
-$.ads = () => {
+$.ads = (id) => {
     let tag = $().create('script');
-    tag.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8393244368108183';
+    tag.type = "text/javascript";
+    tag.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${id}`;
     tag.async = true;
     tag.setAttribute('crossorigin', 'anonymous');
     $('head').append(tag);
 };
+$.gtag = (id) => {
+    let tag = $().create('script');
+    tag.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+    tag.type = "text/javascript";
+    tag.onload = () => {
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', id);
+    };
+    $('head').append(tag);
+};
+$.loadEvent('scroll click resize', () => {
+    $.ads('ca-pub-8393244368108183');
+    $.gtag('G-DR4NXL3E6T');
+});
 $.handler = async (path) => {
     if (path == '/' || $.labels.hasOwnProperty(path.replace('/', ''))) {
         let text = path.replace('/', '');
@@ -381,7 +413,6 @@ $.handler = async (path) => {
         let data = await $.fetchPosts(text);
         if (!('items' in data)) {
             $('#blog').html('<p style="text-align: center;color: #5c5757;padding: 38px 0px 24px 0px">Chưa có đăng bài nào cả.</p>');
-            $.ads();
             return;
         }
         data['items'].forEach((item) => {
@@ -411,7 +442,6 @@ $.handler = async (path) => {
                 $.hide(showmore);
             }
         });
-        $.ads();
     } else if (path.match(new RegExp(/^\/([a-z0-9-_]+)\-([0-9]+){4,4}$/))) {
         $('#blog').html('<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>');
         let blogPath = $.pathToBlog(path);
@@ -440,7 +470,6 @@ $.handler = async (path) => {
             desc: text,
             image: $.getImage(data['content'])
         });
-        $.ads();
     } else {
         $.pageNotFound();
     }
