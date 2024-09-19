@@ -382,7 +382,7 @@ $.gtag = (id) => {
     };
     $('head').append(tag);
 };
-$.loadEvent('scroll click resize', () => {
+$.loadEvent('scroll click', () => {
     $.ads('ca-pub-8393244368108183');
     $.gtag('G-DR4NXL3E6T');
 });
